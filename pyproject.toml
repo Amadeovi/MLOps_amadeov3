@@ -1,0 +1,180 @@
+# https://docs.astral.sh/uv/reference/settings/
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+# PROJECT
+
+[project]
+name = "MLOps_amadeov3"
+version = "0.1.0"
+description = "dummy poc to make MLOps experiments following the Coursera course MLOps from Duke University"
+authors = [{ name = "Amadeo Villar" }]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+keywords = ["mlops", "python", "package"]
+requires-python = ">=3.14"
+dependencies = [
+  "loguru>=0.7.3",
+  "mlflow>=3.15.1",
+]
+
+# LINKS
+
+[project.urls]
+Homepage = "https://github.com/Amadeovi/MLOps_amadeov3"
+Documentation = "https://Amadeovi.github.io/MLOps_amadeov3/"
+Repository = "https://github.com/Amadeovi/MLOps_amadeov3"
+"Bug Tracker" = "https://github.com/Amadeovi/MLOps_amadeov3/issues"
+Changelog = "https://github.com/Amadeovi/MLOps_amadeov3/blob/main/CHANGELOG.md"
+
+# SCRIPTS
+
+[project.scripts]
+MLOps_amadeov3 = "mlops_amadeov3.scripts:main"
+
+# DEPENDENCIES
+
+[dependency-groups]
+dev = [
+  "lefthook>=2.1.10",
+  "pdoc>=16.0.0",
+  "pip-audit>=2.10.1",
+  "pytest>=9.1.1",
+  "pytest-cov>=7.1.0",
+  "pytest-mock>=3.15.1",
+  "pytest-xdist>=3.8.0",
+  # Ruff 0.16 formats Python inside Markdown and rewrote the default rule set:
+  # an older Ruff would disagree with this repository's formatting, so floor it.
+  "ruff>=0.16.2",
+  "ty>=0.0.69,<0.1", # pre-1.0: pin a compatible range until it stabilizes
+  "validate-pyproject>=0.25",
+]
+notebook = ["ipykernel>=6.29.5", "nbformat>=5.10.4"]
+
+# OVERRIDES
+
+[tool.uv]
+# MLflow still declares `cryptography<50`, but the fix for PYSEC-2026-3552 (PKCS#7
+# Bleichenbacher oracle) only ships in 50.0.0. Overriding the stale upper bound installs
+# the patched library; the test suite is what proves MLflow still works with it. Drop
+# this override once MLflow relaxes the constraint upstream.
+override-dependencies = ["cryptography>=50"]
+
+# TOOLS
+
+[tool.ruff]
+line-length = 120
+# Derived from the single `python_version` answer so `requires-python`, ty, and ruff
+# can never drift apart (e.g. "3.14" -> "py314").
+target-version = "py314"
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+quote-style = "double"
+
+[tool.ruff.lint]
+select = [
+  "A", # flake8-builtins
+  "ARG", # flake8-unused-arguments
+  "B", # flake8-bugbear
+  "C4", # flake8-comprehensions
+  "D", # pydocstyle (documented public API)
+  "E", # pycodestyle errors
+  "ERA", # eradicate (no commented-out code)
+  "F", # pyflakes
+  "FA", # flake8-future-annotations
+  "FURB", # refurb (modern constructs)
+  "I", # isort (import sorting)
+  "ISC", # flake8-implicit-str-concat
+  "LOG", # flake8-logging
+  "N", # pep8-naming
+  "PERF", # Perflint
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PT", # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
+  "Q", # flake8-quotes
+  "RET", # flake8-return
+  "RSE", # flake8-raise
+  "RUF", # ruff-specific rules
+  "S", # flake8-bandit (security; replaces bandit)
+  "SIM", # flake8-simplify
+  "SLF", # flake8-self
+  "T10", # flake8-debugger
+  "T20", # flake8-print
+  "TID", # flake8-tidy-imports
+  "UP", # pyupgrade
+  "W", # pycodestyle warnings
+]
+ignore = [
+  "E501", # line length handled by the formatter
+  "N812", # project convention: `import typing as T`
+  "UP040", # some aliases double as runtime constructors (PEP 695 `type` would break them)
+  "RUF012", # Pydantic copies mutable field defaults per-instance (rule false-positive here)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "D100", # missing docstring in public module
+  "D103", # missing docstring in public function
+  "S101", # asserts allowed in tests
+  "T201", # prints allowed in tests
+  "PTH", # os.path allowed in test helpers
+  "PT003", # explicit scope="function" kept for teaching clarity
+  "ARG002", # fixtures requested for their side effects
+  "SLF001", # tests may access internals
+]
+"notebooks/**" = [
+  "S101", # asserts allowed in exploratory notebooks
+  "T201", # prints allowed in exploratory notebooks
+]
+
+[tool.ty.environment]
+python-version = "3.14"
+
+# `ty` (pre-1.0) does not model Pydantic/pandera/MLflow dynamic typing yet; relax the
+# categories they trigger so `ty` still gates real errors (undefined names, bad calls).
+[tool.ty.rules]
+invalid-argument-type = "ignore" # dynamic ML/MLflow call sites
+invalid-frozen-dataclass-subclass = "ignore" # ty reads frozen Pydantic models as frozen dataclasses
+invalid-type-form = "ignore" # pandera typed Series / dynamic type forms
+not-subscriptable = "ignore" # optional dynamic MLflow attributes
+possibly-missing-submodule = "ignore" # lazily-loaded mlflow.* submodules
+unresolved-attribute = "ignore" # dynamic attributes on MLflow/pandera objects
+
+[tool.pytest.ini_options]
+addopts = [
+  "-ra",
+  "--strict-config",
+  "--strict-markers",
+  "--cov=src",
+  "--cov-report=term-missing",
+  # A starting floor for a package that is still mostly scaffolding. The reference
+  # implementation runs at 100; raise this as your suite grows, and treat a drop as a
+  # regression to fix rather than a threshold to lower.
+  "--cov-fail-under=80",
+]
+pythonpath = ["src"]
+testpaths = ["tests"]
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = ["__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+# SYSTEMS
+
+[build-system]
+# Keep the upper bound at least one minor ahead of the pinned `uv` tool: without it
+# `uv build` warns, and a future breaking `uv_build` would silently break the sdist.
+requires = ["uv_build>=0.9,<0.13"]
+build-backend = "uv_build"
