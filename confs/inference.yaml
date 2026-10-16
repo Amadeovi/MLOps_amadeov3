@@ -1,3 +1,0 @@
-# Configuration for the inference job (see src/mlops_amadeov3/scripts.py).
-job:
-  KIND: InferenceJob

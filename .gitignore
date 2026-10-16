@@ -12,6 +12,10 @@
 .ty_cache/
 /htmlcov/
 
+
+# Data
+data/*
+
 # Editor
 /.idea/
 /.vscode/
@@ -32,3 +36,4 @@
 # Python
 *.py[cod]
 __pycache__/
+

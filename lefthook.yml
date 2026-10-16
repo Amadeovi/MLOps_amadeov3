@@ -13,15 +13,15 @@ pre-commit:
       stage_fixed: true
     format:python:
       priority: 10
-      glob: "*.py"
+      glob: "*.{py,ipynb}"
       run: mise run format:python {staged_files}
       stage_fixed: true
     check:leaks:
       priority: 20
       run: mise run check:leaks --staged
-    check:
-      priority: 30
-      run: mise run check
+    check:lint:
+      priority: 20
+      run: mise run check:lint
 
 pre-push:
   commands:
