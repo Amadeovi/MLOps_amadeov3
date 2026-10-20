@@ -125,6 +125,7 @@ ignore = [
   "N812", # project convention: `import typing as T`
   "UP040", # some aliases double as runtime constructors (PEP 695 `type` would break them)
   "RUF012", # Pydantic copies mutable field defaults per-instance (rule false-positive here)
+  "N806", # variables can be upper case, such as X_train or X_test
 ]
 
 [tool.ruff.lint.pydocstyle]
