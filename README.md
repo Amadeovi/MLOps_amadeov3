@@ -1,8 +1,8 @@
-# MLOps Amadeov3
+# MLOps Proof of Concept — Customer Churn Prediction
 
 [![ci.yml](https://github.com/Amadeovi/MLOps_amadeov3/actions/workflows/ci.yml/badge.svg)](https://github.com/Amadeovi/MLOps_amadeov3/actions/workflows/ci.yml) [![cd.yml](https://github.com/Amadeovi/MLOps_amadeov3/actions/workflows/cd.yml/badge.svg)](https://github.com/Amadeovi/MLOps_amadeov3/actions/workflows/cd.yml) [![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://Amadeovi.github.io/MLOps_amadeov3/) [![License](https://img.shields.io/github/license/Amadeovi/MLOps_amadeov3)](https://github.com/Amadeovi/MLOps_amadeov3/blob/main/LICENSE.txt) [![Release](https://img.shields.io/github/v/release/Amadeovi/MLOps_amadeov3)](https://github.com/Amadeovi/MLOps_amadeov3/releases)
 
-dummy poc to make MLOps experiments following the Coursera course MLOps from Duke University
+This project applies concepts from Duke University’s MLOps course on Coursera to an end-to-end machine learning workflow. Using an Iranian telecommunications customer churn dataset, it explores experiment tracking, modular code, automated testing, containerization, and deployment.
 
 ## Installation
 

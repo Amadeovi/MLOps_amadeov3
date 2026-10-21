@@ -126,6 +126,7 @@ ignore = [
   "UP040", # some aliases double as runtime constructors (PEP 695 `type` would break them)
   "RUF012", # Pydantic copies mutable field defaults per-instance (rule false-positive here)
   "N806", # variables can be upper case, such as X_train or X_test
+  "N803",
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -192,3 +193,7 @@ skip_covered = true
 # `uv build` warns, and a future breaking `uv_build` would silently break the sdist.
 requires = ["uv_build>=0.9,<0.13"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "churn"
+module-root = "src"
