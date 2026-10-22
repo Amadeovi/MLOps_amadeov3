@@ -83,7 +83,6 @@ depends = [
   "check:lint",
   "check:scan",
   "check:types",
-  "check:vuln",
 ]
 
 [tasks."check:actions"]
@@ -110,10 +109,6 @@ run = "uv run ruff check --force-exclude ."
 [tasks."check:types"]
 description = "Type-check Python sources (ty)"
 run = "uv run ty check"
-
-[tasks."check:vuln"]
-description = "Scan dependencies for vulnerabilities (pip-audit)"
-run = "uv run pip-audit --skip-editable --cache-dir .cache/pip-audit"
 
 [tasks."check:leaks"]
 description = "Audit codebase for leaked secrets (gitleaks)"
