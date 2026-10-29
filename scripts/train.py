@@ -1,5 +1,7 @@
 """Run the customer churn model training pipeline."""
 
+import os
+
 import click
 import mlflow
 import pandas as pd
@@ -48,7 +50,8 @@ def main(data_path, random_seed, valid_size, experiment_name, run_name):
     )
     fitted_model, metrics_train, metrics_valid = train_model(model, X_train, y_train, X_valid, y_valid)
 
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment(experiment_name)
 
     logger.info("Logging results in MLflow")

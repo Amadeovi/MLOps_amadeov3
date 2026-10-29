@@ -2,7 +2,7 @@
 # Canonical task vocabulary shared by git hooks (lefthook) and CI (GitHub Actions).
 
 [env]
-_.source = ".env"
+_.file = ".env"
 
 [settings.task]
 run_auto_install = false
