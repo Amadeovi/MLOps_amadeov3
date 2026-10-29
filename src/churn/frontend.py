@@ -3,6 +3,7 @@
 import json
 
 import gradio as gr
+import pandas as pd
 import requests
 
 
@@ -35,6 +36,52 @@ def predict_customer(customer_json):
     return response.json()
 
 
+def predict_batch(csv_path):
+    """Request churn predictions for customers in a CSV file.
+
+    Args:
+        csv_path: Path to the uploaded CSV file.
+
+    Returns:
+        Customer records with their churn predictions and probabilities.
+    """
+    if csv_path is None:
+        raise gr.Error("Upload a CSV file first.")
+
+    try:
+        customers = pd.read_csv(csv_path)
+    except (ValueError, OSError) as exc:
+        raise gr.Error("Could not read the CSV file.") from exc
+
+    if customers.empty:
+        raise gr.Error("The CSV must contain at least one customer.")
+
+    # Convert missing values to JSON null instead of invalid JSON NaN.
+    payload = json.loads(customers.to_json(orient="records"))
+
+    try:
+        response = requests.post(
+            "http://127.0.0.1:8000/predict/batch",
+            json=payload,
+            timeout=30,
+        )
+    except requests.RequestException as exc:
+        raise gr.Error("Could not reach the prediction API.") from exc
+
+    if not response.ok:
+        raise gr.Error(f"Prediction request failed: {response.text}")
+
+    predictions = pd.DataFrame(response.json())
+
+    if len(predictions) != len(customers):
+        raise gr.Error("The API returned an unexpected number of predictions.")
+
+    return pd.concat(
+        [customers.reset_index(drop=True), predictions],
+        axis=1,
+    )
+
+
 demo = gr.Interface(
     fn=predict_customer,
     inputs=gr.Textbox(
@@ -47,5 +94,21 @@ demo = gr.Interface(
 )
 
 
+batch_demo = gr.Interface(
+    fn=predict_batch,
+    inputs=gr.File(
+        label="Upload customer CSV",
+        file_types=[".csv"],
+        type="filepath",
+    ),
+    outputs=gr.Dataframe(
+        label="Customer predictions",
+        interactive=False,
+    ),
+    title="Batch Churn Prediction",
+    description="Upload one row per customer to predict churn.",
+)
+
+
 if __name__ == "__main__":
-    demo.launch()
+    batch_demo.launch()

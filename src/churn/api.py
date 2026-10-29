@@ -91,3 +91,14 @@ async def predict_churn(customer: Customer, request: Request):
         "churn_prediction": int(result["churn_prediction"]),
         "churn_probability": float(result["churn_probability"]),
     }
+
+
+@app.post("/predict/batch", response_model=list[PredictionResponse])
+def predict_churn_batch(customers: list[Customer], request: Request):
+    """Predict churn and its probability for multiple customers."""
+    features = pd.DataFrame([customer.model_dump() for customer in customers])
+
+    model = request.app.state.model
+    results = predict_customers(model, features)
+
+    return results.to_dict(orient="records")
