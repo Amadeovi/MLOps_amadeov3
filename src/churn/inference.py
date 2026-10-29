@@ -2,6 +2,9 @@
 
 import mlflow.sklearn
 import pandas as pd
+from loguru import logger
+
+from churn.validation import validate_features
 
 
 def load_model(model_uri):
@@ -26,10 +29,17 @@ def predict_customers(model, features):
     Returns:
         DataFrame containing churn predictions and probabilities.
     """
+    validated_features = validate_features(
+        features,
+        expected_columns=list(model.feature_name_),
+    )
+    logger.info(f"Validated {len(validated_features)} customer records")
+    logger.info(f"Number of customer features {len(validated_features.columns)}")
+
     return pd.DataFrame(
         {
-            "churn_prediction": model.predict(features),
-            "churn_probability": model.predict_proba(features)[:, 1],
+            "churn_prediction": model.predict(validated_features),
+            "churn_probability": model.predict_proba(validated_features)[:, 1],
         },
-        index=features.index,
+        index=validated_features.index,
     )
