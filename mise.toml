@@ -216,3 +216,13 @@ run = [
   "find . -type d -name __pycache__ -exec rm -rf {} +",
   "rm -rf .cache .pytest_cache .ruff_cache .ty_cache .coverage htmlcov dist docs mlflow.db mlartifacts/* mlruns/* outputs/*",
 ]
+
+# DEVELOPMENT
+
+[tasks.app]
+description = "Start the FastAPI development server"
+run = "uv run uvicorn churn.api:app --reload"
+
+[tasks.frontend]
+description = "Start the Gradio frontend"
+run = "uv run python -m churn.frontend"

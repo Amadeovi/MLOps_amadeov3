@@ -27,6 +27,7 @@ data/*
 
 # Project
 /docs/*
+.gradio/
 /mlflow.db
 /mlruns/*
 /mlartifacts/*

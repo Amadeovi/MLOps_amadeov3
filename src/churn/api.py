@@ -10,6 +10,7 @@ Architecture:
 - Pydantic: Data validation and automatic API documentation.
 """
 
+import os
 from contextlib import asynccontextmanager
 from typing import Literal
 
@@ -21,17 +22,14 @@ from pydantic import BaseModel, Field
 
 from churn.inference import load_model, predict_customers
 
-MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
-MODEL_URI = "models:/m-9f24f420806c464997cd23870e4bc0af"
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Load the model at startup and release it at shutdown."""
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
     logger.info("Loading churn model")
-    app.state.model = load_model(MODEL_URI)
+    app.state.model = load_model(os.getenv("MODEL_URI"))
     logger.info("Churn model loaded successfully")
 
     try:
