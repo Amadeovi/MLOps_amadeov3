@@ -2,7 +2,7 @@
 
 # 🔧 Base Python image
 # Build stage: install dependencies and the churn package.
-FROM python:3.14-slim AS build
+FROM python:3.15-slim AS build
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 
 # Runtime stage: run the API as a non-root user.
-FROM python:3.14-slim
+FROM python:3.15-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH"
