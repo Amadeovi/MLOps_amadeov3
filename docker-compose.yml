@@ -1,10 +1,20 @@
 # https://docs.docker.com/compose/compose-file/
 
 services:
-  mlflow:
-    image: ghcr.io/mlflow/mlflow:v3.15.1
+  api:
+    image: churn-api:latest
+    pull_policy: never
     ports:
-      - 5000:5000
+      - "127.0.0.1:8001:8000"
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MODEL_URI: "${MODEL_URI:?Set MODEL_URI in .env}"
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.16.1
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      MLFLOW_SERVER_ALLOWED_HOSTS: "mlflow:5000,127.0.0.1:5000,localhost:5000"
     volumes:
       - ./mlflow.db:/mlflow/mlflow.db
       - ./mlartifacts:/mlflow/mlartifacts
