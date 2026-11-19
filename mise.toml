@@ -32,8 +32,12 @@ description = "Install dependencies and git hooks"
 depends = ["install:hooks"]
 
 [tasks."install:python"]
-description = "Sync Python dependencies (uv)"
-run = "uv sync --all-groups"
+description = "Sync application and development dependencies"
+run = "uv sync"
+
+[tasks."install:notebook"]
+description = "Also install notebook experimentation dependencies"
+run = "uv sync --group notebook"
 
 [tasks."install:hooks"]
 description = "Install git hooks (lefthook)"
@@ -146,19 +150,19 @@ description = "Build Python distribution artifacts (uv)"
 run = "uv build"
 
 [tasks."build:image"]
-description = "Build the production OCI image (Docker)"
-run = "docker build --tag=MLOps_amadeov3:latest ."
+description = "Build the churn API Docker image"
+run = "docker build --tag=churn-api:latest ."
 
 # DOCS
 
 [tasks.docs]
 alias = "d"
 description = "Generate the API documentation (pdoc)"
-run = "uv run pdoc --docformat=google --output-directory=docs src/mlops_amadeov3"
+run = "uv run pdoc --docformat=google --output-directory=docs src/churn"
 
 [tasks."docs:serve"]
-description = "Serve the API documentation (pdoc)"
-run = "uv run pdoc --docformat=google --port=8088 src/mlops_amadeov3"
+description = "Serve the Python API"
+run = "uv run pdoc --docformat=google --port=8088 src/churn"
 
 # MLFLOW
 
@@ -188,13 +192,25 @@ run = 'uv run mlflow run --env-manager=local --experiment-name=MLOps_amadeov3 --
 
 # DOCKER
 
-[tasks."docker:compose"]
-description = "Start the local MLflow server with Docker Compose"
-run = "docker compose up"
+[tasks."docker:mlflow"]
+description = "Start MLflow in Docker in the background"
+run = "docker compose up -d mlflow"
 
-[tasks."docker:run"]
-description = "Run the latest built image"
-run = "docker run --rm MLOps_amadeov3:latest"
+[tasks."docker:api"]
+description = "Start the API using the locally built image"
+run = "docker compose up --pull never api"
+
+[tasks."docker:logs"]
+description = "Follow API and MLflow logs"
+run = "docker compose logs --follow api mlflow"
+
+[tasks."docker:status"]
+description = "Show the status of the Compose services"
+run = "docker compose ps"
+
+[tasks."docker:stop"]
+description = "Stop and remove the Compose containers"
+run = "docker compose down"
 
 # UTILITIES
 
