@@ -192,6 +192,17 @@ run = 'uv run mlflow run --env-manager=local --experiment-name=MLOps_amadeov3 --
 
 # DOCKER
 
+[tasks."docker:rebuild"]
+description = "Rebuild the application image and start all services"
+run = ["mise run build:image", "mise run docker:up"]
+
+[tasks."docker:up"]
+description = "Start all services and display their URLs"
+run = [
+  "docker compose up -d --pull never mlflow api frontend",
+  '''uv run python -c "print('\nGradio frontend: http://127.0.0.1:7860\nFastAPI docs:    http://127.0.0.1:8001/docs\nMLflow:          http://127.0.0.1:5000\n')"''',
+]
+
 [tasks."docker:mlflow"]
 description = "Start MLflow in Docker in the background"
 run = "docker compose up -d mlflow"
@@ -199,6 +210,10 @@ run = "docker compose up -d mlflow"
 [tasks."docker:api"]
 description = "Start the API using the locally built image"
 run = "docker compose up --pull never api"
+
+[tasks."docker:frontend"]
+description = "Start the Gradio frontend in Docker"
+run = "docker compose up -d --pull never frontend"
 
 [tasks."docker:logs"]
 description = "Follow API and MLflow logs"

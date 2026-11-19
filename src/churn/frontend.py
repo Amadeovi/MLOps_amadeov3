@@ -1,6 +1,7 @@
 """Provide a Gradio interface for the churn prediction API."""
 
 import json
+import os
 
 import gradio as gr
 import pandas as pd
@@ -16,6 +17,8 @@ def predict_customer(customer_json):
     Returns:
         The prediction response or an error message.
     """
+    API_URL = os.getenv("API_URL", "http://127.0.0.1:8000").rstrip("/")
+
     try:
         customer = json.loads(customer_json)
     except json.JSONDecodeError as exc:
@@ -23,7 +26,7 @@ def predict_customer(customer_json):
 
     try:
         response = requests.post(
-            "http://127.0.0.1:8000/predict",
+            f"{API_URL}/predict",
             json=customer,
             timeout=30,
         )
@@ -45,6 +48,8 @@ def predict_batch(csv_path):
     Returns:
         Customer records with their churn predictions and probabilities.
     """
+    API_URL = os.getenv("API_URL", "http://127.0.0.1:8000").rstrip("/")
+
     if csv_path is None:
         raise gr.Error("Upload a CSV file first.")
 
@@ -61,7 +66,7 @@ def predict_batch(csv_path):
 
     try:
         response = requests.post(
-            "http://127.0.0.1:8000/predict/batch",
+            f"{API_URL}/predict/batch",
             json=payload,
             timeout=30,
         )

@@ -9,6 +9,9 @@ services:
     environment:
       MLFLOW_TRACKING_URI: "http://mlflow:5000"
       MODEL_URI: "${MODEL_URI:?Set MODEL_URI in .env}"
+    depends_on:
+      mlflow:
+        condition: service_healthy
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.16.1
     ports:
@@ -22,3 +25,23 @@ services:
     # SQLAlchemy backend, same store the package writes to locally: the file store is in
     # maintenance mode in MLflow 3 and was never designed for the model registry.
     command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db --artifacts-destination ./mlartifacts
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=5)"
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 15s
+  frontend:
+    image: churn-api:latest
+    pull_policy: never
+    command: ["python", "-m", "churn.frontend"]
+    ports:
+      - "127.0.0.1:7860:7860"
+    environment:
+      API_URL: "http://api:8000"
+      GRADIO_SERVER_NAME: "0.0.0.0"
+      GRADIO_SERVER_PORT: "7860"
